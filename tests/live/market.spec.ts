@@ -6,7 +6,7 @@ test('real Binance REST, ticker streams and candlesticks work directly in the br
   page.on('request', request => { if (request.url().includes('binance.vision')) requests.push(request.url()); });
   page.on('websocket', socket => socket.on('framereceived', frame => frames.push(String(frame.payload))));
   await page.goto('/');
-  await expect(page.locator('.demo-tag')).toHaveText('SPOT');
+  await expect(page.getByRole('button', { name: 'Crypto', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByTestId('tile-btc').locator('.tile-price')).not.toHaveText('—', { timeout: 40000 });
   for (const id of ['btc', 'eth', 'sol', 'ltc', 'gram', 'trx', 'bnb', 'xrp']) {
     await expect(page.getByTestId(`tile-${id}`).locator('.sparkline')).toBeVisible();
@@ -112,3 +112,20 @@ for (const exchange of ['binance', 'mexc'] as const) {
     await expect(page).toHaveURL(new RegExp(`#/movers/${exchange}$`));
   });
 }
+
+test('World Market loads Yahoo metal futures, indices, Brent and five currency pairs', async ({ page }) => {
+  await page.goto('/#/market');
+  await expect(page.locator('.world-tile')).toHaveCount(10);
+  for (const id of ['gold', 'silver', 'sp500', 'nasdaq100', 'brent', 'usd-eur', 'usd-rub', 'usd-uzs', 'usd-cny', 'usd-kzt']) {
+    await expect(page.getByTestId(`world-${id}`).locator('.tile-price')).not.toHaveText(/^—/, { timeout: 35000 });
+  }
+  await expect(page.getByTestId('world-usd-uzs')).toContainText('YAHOO');
+  await expect(page.getByTestId('world-brent')).toContainText('Brent futures');
+  await page.screenshot({ path: 'test-results-live/world-market.png', fullPage: true });
+  await page.getByRole('button', { name: 'Open S&P 500', exact: true }).click();
+  await expect(page.getByTestId('world-chart').locator('canvas').first()).toBeVisible({ timeout: 20000 });
+  await page.getByRole('button', { name: 'Back to Market' }).click();
+  await page.getByRole('button', { name: 'Open USD/UZS', exact: true }).click();
+  await expect(page.getByTestId('world-chart').locator('canvas').first()).toBeVisible({ timeout: 20000 });
+  await expect(page.locator('.intervals')).toBeVisible();
+});

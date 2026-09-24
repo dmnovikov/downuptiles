@@ -2,7 +2,7 @@
 
 <img src="public/logo.png" alt="downuptiles logo" width="96" />
 
-A compact, mobile-first crypto watchlist. React + TypeScript + Vite, with an English UI.
+A compact, mobile-first crypto watchlist and world-market dashboard. React + TypeScript + Vite, with an English UI.
 The application uses **real Binance Spot and MEXC Spot market data**.
 No API keys, exchange account or trading permissions are required. Binance connects directly;
 MEXC uses the included public-data proxy because its REST API does not allow browser CORS.
@@ -27,8 +27,29 @@ npm run preview
 ```
 
 The production build is in `dist/`. Run `npm start` after building to serve it with the MEXC
-proxy (default port 5173; override with `PORT`). Development and preview include the same proxy.
-A static-only deployment must route `/api/mexc/*` to this server. No private credentials are used.
+and world-market endpoints (default port 5173; override with `PORT`). Development and preview include both.
+A static-only deployment must route `/api/mexc/*` and `/api/world/*` to this server. No private credentials are used.
+
+## Crypto / Market
+
+The header switches between the saved crypto watchlist and ten fixed Market tiles:
+gold, silver, S&P 500, Nasdaq-100, Brent futures, USD/EUR, USD/RUB, USD/UZS, USD/CNY and USD/KZT.
+Uzbek som is UZS; Kazakh tenge is KZT. Navigation and reload preserve the selected mode.
+
+- All ten instruments use Yahoo Finance: gold (`GC=F`), silver (`SI=F`), Brent (`BZ=F`),
+  S&P 500 (`^GSPC`), Nasdaq-100 (`^NDX`) and currencies (`EUR=X`, `RUB=X`, `UZS=X`, `CNY=X`, `KZT=X`).
+- Gold, silver and oil are **futures**, not physical spot quotes. Metals use USD per troy ounce;
+  Brent uses USD per barrel. Indices are quoted in points; currencies are units per one USD.
+- All detail charts offer 15m, 1h and daily candles from Yahoo. Percent change uses the previous
+  session close, not the start of the displayed history. Currency updates can be infrequent.
+- Prices may be delayed. Yahoo's public chart endpoint is unofficial and may change or rate-limit
+  requests. No Gold API or CBU requests remain; the old mixed-source local quote cache is ignored.
+- Every detail view shows the source, quote date and data limitations. Refresh runs every minute;
+  cached values remain gray while updating or offline. First-load failures show `No data` with retry.
+- The fixed-symbol `/api/world/quote` endpoint shares cached upstream responses and identical pending
+  requests across visitors. Upstream concurrency is four, the waiting queue is capped at forty,
+  and each upstream request times out after ten seconds. Client timeout is thirty seconds.
+  Successful upstream responses are cached for one minute.
 
 ## Market data
 
@@ -193,7 +214,7 @@ Mock prices and all chart intervals derive from one deterministic function of ti
 PWA/service worker, offline cold start, Capacitor, Android/iOS projects and app-store packaging are
 not implemented yet. The current milestone is the mobile web app. Physical Android/iPhone testing
 is still needed; Chromium touch emulation does not replace it. No accounts, orders, wallets,
-alerts, portfolio or cloud sync are included. The only server component is the public MEXC proxy.
+alerts, portfolio or cloud sync are included. Server components provide public MEXC and world-market data.
 
 The conversation refinements supersede the original `task.md`: daily sparklines, signed movement
 dots, candlestick intervals, compact English UI, and now real market data.

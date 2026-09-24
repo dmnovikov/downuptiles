@@ -383,3 +383,41 @@ test('Market movers switches sources, opens charts, preserves watchlists and han
   await expect(page.getByRole('heading', { name: 'Top 5 Gainers' })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('cryptotiles.workspace'))).toBe(before);
 });
+
+test('Crypto and Market switch preserves watchlists, labels world prices and supports history/back', async ({ page }) => {
+  await page.route('**/api/world/quote?*', route => {
+    const id = new URL(route.request().url()).searchParams.get('id')!;
+    const fx = id.startsWith('usd-');
+    return route.fulfill({ json: { id, price: fx ? 1.2 : 100, change: 2,
+      asOf: '2026-09-25T00:00:00+05:00', status: 'Market closed', period: 'Day',
+      historyLabel: '5 days · 15m candles', note: 'Source details', sourceUrl: 'https://finance.yahoo.com/',
+      points: [{ time: 1700000000, value: 98 }, { time: 1700086400, value: 100 }],
+      candles: [{ time: 1700000000, open: 97, high: 100, low: 96, close: 98, volume: 10 }, { time: 1700086400, open: 98, high: 102, low: 97, close: 100, volume: 10 }],
+    } });
+  });
+  await page.goto('/');
+  const saved = await page.evaluate(() => localStorage.getItem('cryptotiles.workspace'));
+  await page.getByRole('button', { name: 'Market', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Market', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.world-tile')).toHaveCount(10);
+  await expect(page.getByTestId('world-usd-kzt')).toContainText('USD/KZT');
+  await expect(page.getByTestId('world-usd-uzs')).toContainText('YAHOO');
+  await expect(page.getByTestId('world-gold')).toContainText('Gold futures');
+  await page.getByRole('button', { name: 'Open S&P 500', exact: true }).click();
+  await expect(page.getByTestId('world-chart').locator('canvas').first()).toBeVisible();
+  await page.getByRole('button', { name: '1d', exact: true }).click();
+  await page.getByRole('button', { name: 'Back to Market' }).click();
+  await page.getByRole('button', { name: 'Open USD/UZS', exact: true }).click();
+  await expect(page.getByTestId('world-chart').locator('canvas').first()).toBeVisible();
+  await expect(page.getByRole('button', { name: '1d', exact: true })).toBeVisible();
+  await page.goBack();
+  await page.reload();
+  await expect(page.locator('.world-tile')).toHaveCount(10);
+  for (const width of [320, 390, 768]) {
+    await page.setViewportSize({ width, height: 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await page.getByRole('button', { name: 'Crypto', exact: true }).click();
+  await expect(page.getByRole('tabpanel')).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('cryptotiles.workspace'))).toBe(saved);
+});
