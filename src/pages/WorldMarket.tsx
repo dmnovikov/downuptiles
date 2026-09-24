@@ -6,7 +6,7 @@ export function WorldMarket({ onOpen }: { onOpen: (id: string) => void }) {
   const { entries, retry } = useWorldQuotes(WORLD_ASSETS.map(a => a.id));
   const failed = Object.values(entries).some(e => e.error);
   return <main aria-label="World markets">
-    <div className="grid-caption"><span>WORLD MARKETS</span><span>METALS · INDICES · FX · OIL</span></div>
+    <div className="grid-caption"><span>WORLD MARKETS (for reference)</span><span>METALS · INDICES · FX · OIL</span></div>
     {failed && <p className="world-notice" role="status">Some sources are unavailable. <button className="text-button" onClick={retry}>Retry</button></p>}
     <div className="quote-grid">{WORLD_ASSETS.map(asset => {
       const entry = entries[asset.id], quote = entry?.quote;

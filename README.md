@@ -32,7 +32,7 @@ A static-only deployment must route `/api/mexc/*` and `/api/world/*` to this ser
 
 ## Crypto / Market
 
-The header switches between the saved crypto watchlist and ten fixed Market tiles:
+The header offers **Crypto / Tops / Market**: saved crypto watchlists, Top movers, and ten fixed Market tiles:
 gold, silver, S&P 500, Nasdaq-100, Brent futures, USD/EUR, USD/RUB, USD/UZS, USD/CNY and USD/KZT.
 Uzbek som is UZS; Kazakh tenge is KZT. Navigation and reload preserve the selected mode.
 
@@ -109,7 +109,7 @@ Failed first loads show `No data`. Cache writes are throttled to once per five s
 with a final save when the page is hidden or left. Unavailable browser storage does not
 prevent live updates. Quote caches are separate from layout exports.
 
-- Tap the logo for **Top movers**: up to five gainers and five losers across all tabs.
+- Tap **Tops** (or the logo) for **Top movers**: up to five gainers and five losers across all tabs.
   Repeated exchange pairs are deduplicated; the same symbol on different exchanges remains separate.
   Only quotes from a healthy connection, without errors and no older than 60 seconds, qualify.
   Displayed zero changes are excluded. Rankings update automatically; tap a tile for its chart.

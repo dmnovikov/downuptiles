@@ -397,6 +397,11 @@ test('Crypto and Market switch preserves watchlists, labels world prices and sup
   });
   await page.goto('/');
   const saved = await page.evaluate(() => localStorage.getItem('cryptotiles.workspace'));
+  await page.getByRole('button', { name: 'Tops', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Top movers', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Tops', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Tops', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: 'Market', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Market', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.world-tile')).toHaveCount(10);
