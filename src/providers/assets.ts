@@ -1,0 +1,28 @@
+import type { Asset } from '../types/market';
+
+export const KNOWN_ASSETS: Asset[] = [
+  { id: 'btc', symbol: 'BTC', name: 'Bitcoin', color: '#f3ac57' },
+  { id: 'eth', symbol: 'ETH', name: 'Ethereum', color: '#9faafa' },
+  { id: 'sol', symbol: 'SOL', name: 'Solana', color: '#b393fb' },
+  { id: 'ltc', symbol: 'LTC', name: 'Litecoin', color: '#aabbd6' },
+  { id: 'gram', symbol: 'GRAM', name: 'Gram (formerly Toncoin)', color: '#6ac6ed' },
+  { id: 'trx', symbol: 'TRX', name: 'TRON', color: '#ec7581' },
+  { id: 'bnb', symbol: 'BNB', name: 'BNB', color: '#edc864' },
+  { id: 'xrp', symbol: 'XRP', name: 'XRP', color: '#b9c8d0' },
+  { id: 'doge', symbol: 'DOGE', name: 'Dogecoin', color: '#c8af69' },
+  { id: 'ada', symbol: 'ADA', name: 'Cardano', color: '#689dec' },
+  { id: 'avax', symbol: 'AVAX', name: 'Avalanche', color: '#ed7979' },
+  { id: 'link', symbol: 'LINK', name: 'Chainlink', color: '#7c9ffa' },
+  { id: 'dot', symbol: 'DOT', name: 'Polkadot', color: '#e887bb' },
+  { id: 'ton', symbol: 'TON', name: 'Toncoin', color: '#62c0eb' },
+  { id: 'uni', symbol: 'UNI', name: 'Uniswap', color: '#ec8ebd' },
+  { id: 'near', symbol: 'NEAR', name: 'NEAR Protocol', color: '#bcdccc' },
+  { id: 'atom', symbol: 'ATOM', name: 'Cosmos', color: '#c1b2df' },
+  { id: 'arb', symbol: 'ARB', name: 'Arbitrum', color: '#7fb4e1' },
+  { id: 'op', symbol: 'OP', name: 'Optimism', color: '#ec827e' },
+  { id: 'sui', symbol: 'SUI', name: 'Sui', color: '#7dbeed' },
+  { id: 'pepe', symbol: 'PEPE', name: 'Pepe', color: '#99bd6c' },
+  { id: 'shib', symbol: 'SHIB', name: 'Shiba Inu', color: '#eda36d' },
+  { id: 'aave', symbol: 'AAVE', name: 'Aave', color: '#a695de' },
+  { id: 'apt', symbol: 'APT', name: 'Aptos', color: '#b2dbd8' },
+];
