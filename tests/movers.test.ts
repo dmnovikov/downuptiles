@@ -21,3 +21,15 @@ it('excludes missing, cached, stale, offline and failed prices without hiding he
   expect(result.freshCount).toBe(2); expect(result.gainers.map(e => e.id)).toEqual(['mexc:BTC']); expect(result.losers.map(e => e.id)).toEqual(['btc']);
   expect(rankMovers([], now)).toEqual({ gainers: [], losers: [], total: 0, freshCount: 0 });
 });
+
+it('selects the volume top 100 before choosing ten gainers and losers', async () => {
+  const { rankMarketMovers } = await import('../src/services/movers');
+  const tickers = Array.from({ length: 110 }, (_, i) => ({ ...entry(`pair${i.toString().padStart(3, '0')}`, i % 2 ? -i - 1 : i + 1).quote!, quoteVolume: 10000 - i }));
+  tickers[109].change24h = 100000;
+  const ranked = rankMarketMovers(tickers, now);
+  expect(ranked.count).toBe(100);
+  expect(ranked.gainers).toHaveLength(10); expect(ranked.losers).toHaveLength(10);
+  expect(ranked.gainers[0].assetId).toBe('pair098'); expect(ranked.losers[0].assetId).toBe('pair099');
+  expect([...ranked.gainers, ...ranked.losers].some(q => q.assetId === 'pair109')).toBe(false);
+  expect(rankMarketMovers([{ ...tickers[0], updatedAt: now - 121 }], now).count).toBe(0);
+});

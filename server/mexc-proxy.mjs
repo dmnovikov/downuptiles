@@ -22,7 +22,7 @@ export function mexcProxy(req, res, next) {
   if (!request) {
     request = fetch(`https://api.mexc.com/api/v3/${key}`, { signal: AbortSignal.timeout(10000), redirect: 'error' })
       .then(async response => {
-        const result = { status: response.status, body: await response.text(), retry: response.headers.get('Retry-After'), expires: Date.now() + (path === 'exchangeInfo' ? 3600000 : 3000) };
+        const result = { status: response.status, body: await response.text(), retry: response.headers.get('Retry-After'), expires: Date.now() + (path === 'exchangeInfo' ? 3600000 : path === 'ticker/24hr' && !url.searchParams.has('symbol') ? 30000 : 3000) };
         if (response.ok) { if (cache.size >= 500) cache.delete(cache.keys().next().value); cache.set(key, result); }
         return result;
       }).catch(() => ({ status: 502, body: JSON.stringify({ message: 'MEXC is temporarily unavailable.' }) }))

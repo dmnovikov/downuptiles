@@ -1,3 +1,4 @@
+import { parseMarketTickers } from './market-tickers';
 import { type Asset, type Candle, type HistoryRequest, type Interval, type MarketDataProvider, type Point, type Quote, type QuoteResult } from '../types/market';
 import { KNOWN_ASSETS } from './assets';
 
@@ -118,6 +119,11 @@ export class BinanceMarketDataProvider implements MarketDataProvider {
       const symbol = this.symbolFor(asset.id);
       return symbol && this.markets.has(symbol) && `${asset.symbol} ${asset.name}`.toLowerCase().includes(term);
     }).sort((a, b) => Number(b.symbol.toLowerCase() === term) - Number(a.symbol.toLowerCase() === term) || Number(!KNOWN_ASSETS.some(asset => asset.id === a.id)) - Number(!KNOWN_ASSETS.some(asset => asset.id === b.id)) || a.symbol.localeCompare(b.symbol));
+  }
+  async getMarketTickers(signal?: AbortSignal) {
+    await this.ensureMarkets(signal);
+    const ids = new Map([...this.assets.values()].filter(asset => this.markets.has(this.symbolFor(asset.id)!)).map(asset => [this.symbolFor(asset.id)!, asset.id]));
+    return parseMarketTickers(await this.request('ticker/24hr', {}, signal), ids);
   }
   async getHistory(id: string, { interval, before, limit = 240, signal }: HistoryRequest): Promise<Candle[]> {
     await this.ensureMarkets(signal);

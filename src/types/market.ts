@@ -4,6 +4,7 @@ export interface Quote {
   assetId: string; price: number; change24h: number; updatedAt: number;
   high24h: number; low24h: number; sparkline: Point[];
 }
+export interface MarketTicker extends Quote { quoteVolume: number }
 export interface QuoteError { assetId: string; error: string }
 export type QuoteResult = Quote | QuoteError;
 export interface Candle { time: number; open: number; high: number; low: number; close: number; volume: number }
@@ -15,6 +16,7 @@ export interface MarketDataProvider {
   readonly isDemo: boolean;
   searchAssets(query: string, signal?: AbortSignal): Promise<Asset[]>;
   getAsset(id: string): Asset | undefined;
+  getMarketTickers?(signal?: AbortSignal): Promise<MarketTicker[]>;
   getQuote(id: string, signal?: AbortSignal): Promise<Quote>;
   getQuotes(ids: string[], signal?: AbortSignal): Promise<QuoteResult[]>;
   getHistory(id: string, request: HistoryRequest): Promise<Candle[]>;

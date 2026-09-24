@@ -93,6 +93,16 @@ prevent live updates. Quote caches are separate from layout exports.
   Only quotes from a healthy connection, without errors and no older than 60 seconds, qualify.
   Displayed zero changes are excluded. Rankings update automatically; tap a tile for its chart.
   Back returns through Top movers to the previously selected watchlist.
+- Top movers includes **My pairs / Binance / MEXC** tabs. Market tabs select the 100 active
+  USDT pairs with the largest 24-hour quote volume on that exchange, then show up to ten
+  gainers and ten losers within that set. Only tickers updated within the last two minutes
+  qualify. Zero changes are omitted, so either list can contain fewer than ten pairs.
+- Market rankings refresh every minute. One bulk ticker request selects leaders; only their
+  (at most twenty) 15-minute sparklines are fetched, four at a time. Prices and percentages
+  remain from the same ranking snapshot. No watchlist additions occur automatically.
+- Switching tabs stops the previous ranking's requests. Offline/failed refreshes retain the
+  last ranking in gray with a warning. Market-tab selection survives chart navigation and reload.
+  The MEXC proxy caches the bulk ticker response for 30 seconds across visitors.
 - Two compact columns on phones; four on wide screens.
 - Initial Main tab: BTC, ETH, SOL, LTC, GRAM, TRX, BNB, XRP, in that order.
 - Price, daily sparkline and rolling 24h percentage. Green for gains, red for losses, yellow for

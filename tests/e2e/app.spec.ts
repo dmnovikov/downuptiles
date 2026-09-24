@@ -355,3 +355,31 @@ test('Top movers direct link handles an empty workspace and returns safely', asy
   await page.getByRole('button', { name: 'Back to watchlist' }).click();
   await expect(page.getByRole('heading', { name: 'Your next watchlist' })).toBeVisible();
 });
+
+test('Market movers switches sources, opens charts, preserves watchlists and handles offline data', async ({ page, context }) => {
+  await page.goto('/');
+  const before = await page.evaluate(() => localStorage.getItem('cryptotiles.workspace'));
+  await page.getByRole('link', { name: 'downuptiles · Top movers' }).click();
+  await page.getByRole('tab', { name: 'Binance', exact: true }).click();
+  await expect(page).toHaveURL(/#\/movers\/binance$/);
+  await expect(page.getByRole('heading', { name: 'Top 10 Gainers' })).toBeVisible();
+  await expect(page.locator('.movers-page .quote-tile').first()).toBeVisible();
+  const gainers = page.getByRole('region', { name: 'Top 10 Gainers' });
+  expect(await gainers.locator('.quote-tile').count()).toBeLessThanOrEqual(10);
+  await page.locator('.movers-page .tile-content').first().click();
+  await expect(page.getByTestId('candle-chart')).toBeVisible();
+  await page.getByRole('button', { name: 'Back to Top movers' }).click();
+  await expect(page.getByRole('tab', { name: 'Binance', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await page.getByRole('tab', { name: 'MEXC', exact: true }).click();
+  await expect(page.locator('.movers-page .quote-tile').first()).toBeVisible();
+  await context.setOffline(true);
+  await expect(page.getByRole('alert')).toContainText('Offline');
+  await expect(page.locator('.movers-page .quote-tile').first()).toHaveClass(/stale/);
+  await context.setOffline(false);
+  await expect(page.locator('.movers-page .quote-tile').first()).not.toHaveClass(/stale/);
+  await page.reload();
+  await expect(page.getByRole('tab', { name: 'MEXC', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await page.getByRole('tab', { name: 'My pairs', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Top 5 Gainers' })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('cryptotiles.workspace'))).toBe(before);
+});

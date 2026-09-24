@@ -85,3 +85,30 @@ test('MEXC-only MX pair recovers from an outage without interrupting Binance', a
   await expect(page.getByRole('button', { name: 'BTC already added on BINANCE', exact: true })).toBeVisible({ timeout: 20000 });
   await expect(page.getByRole('alert')).toContainText('MEXC search unavailable');
 });
+
+for (const exchange of ['binance', 'mexc'] as const) {
+  test(`market-wide ${exchange} ranks top 100 by volume and loads only displayed charts`, async ({ page }) => {
+    const historyRequests: string[] = [];
+    page.on('request', request => { if (request.url().includes('/klines?')) historyRequests.push(request.url()); });
+    await page.goto(`/#/movers/${exchange}`);
+    await expect(page.getByRole('tab', { name: exchange === 'binance' ? 'Binance' : 'MEXC', exact: true })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByText('100 most traded USDT pairs · Updates every minute')).toBeVisible({ timeout: 30000 });
+    const gainers = page.getByRole('region', { name: 'Top 10 Gainers' }), losers = page.getByRole('region', { name: 'Top 10 Losers' });
+    await expect(gainers.locator('.quote-tile')).toHaveCount(10);
+    await expect(losers.locator('.quote-tile')).toHaveCount(10);
+    await expect(page.locator('.movers-page svg.sparkline')).toHaveCount(20, { timeout: 30000 });
+    expect(historyRequests.length).toBe(20);
+    const positive = await gainers.locator('.tile-change').allTextContents();
+    const negative = await losers.locator('.tile-change').allTextContents();
+    const parse = (text: string) => Number(text.replace('−', '-').replace('%', ''));
+    expect(positive.every(value => parse(value) > 0)).toBe(true);
+    expect(negative.every(value => parse(value) < 0)).toBe(true);
+    expect(positive.map(parse)).toEqual(positive.map(parse).sort((a, b) => b - a));
+    expect(negative.map(parse)).toEqual(negative.map(parse).sort((a, b) => a - b));
+    await page.screenshot({ path: `test-results-live/market-movers-${exchange}.png`, fullPage: true });
+    await page.locator('.movers-page .tile-content').first().click();
+    await expect(page.locator('.ohlc b').first()).not.toHaveText('—', { timeout: 20000 });
+    await page.getByRole('button', { name: 'Back to Top movers' }).click();
+    await expect(page).toHaveURL(new RegExp(`#/movers/${exchange}$`));
+  });
+}

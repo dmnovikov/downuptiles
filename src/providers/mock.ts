@@ -39,6 +39,10 @@ export class MockMarketDataProvider implements MarketDataProvider {
     signal?.throwIfAborted();
     return catalog.filter(a => `${a[1]} ${a[2]}`.toLowerCase().includes(query.trim().toLowerCase())).map(a => this.getAsset(a[0])!);
   }
+  async getMarketTickers(signal?: AbortSignal) {
+    signal?.throwIfAborted();
+    return catalog.map((asset, i) => ({ ...this.quoteAt(asset[0], Math.floor(Date.now() / 1000)), quoteVolume: (catalog.length - i) * 1000000 }));
+  }
   /** One deterministic price function backs quotes, all candle intervals, and sparklines. */
   priceAt(id: string, time: number): number {
     const i = catalog.findIndex(a => a[0] === id);
