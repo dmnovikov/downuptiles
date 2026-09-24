@@ -1,4 +1,4 @@
-const USER_AGENT = 'downuptiles/0.1 (+https://github.com/dmnovikov/cryptotiles)';
+const USER_AGENT = 'downuptiles/0.1 (+https://github.com/dmnovikov/downuptiles)';
 const cache = new Map(), pending = new Map();
 const yahooSymbols = { gold: 'GC=F', silver: 'SI=F', sp500: '^GSPC', nasdaq100: '^NDX', brent: 'BZ=F',
   'usd-eur': 'EUR=X', 'usd-rub': 'RUB=X', 'usd-uzs': 'UZS=X', 'usd-cny': 'CNY=X', 'usd-kzt': 'KZT=X' };
