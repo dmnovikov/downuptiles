@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Maximize2 } from 'lucide-react';
 import { CandlestickSeries, ColorType, CrosshairMode, HistogramSeries, createChart, type IChartApi, type ISeriesApi, type UTCTimestamp } from 'lightweight-charts';
-import { provider } from '../services/market';
+import { providerFor } from '../services/market';
 import { useConnection, useQuote } from '../hooks/useMarket';
 import { direction, formatChange, formatPrice, precision } from '../services/format';
 import { INTERVALS, type Candle, type Interval } from '../types/market';
@@ -9,7 +9,8 @@ const labels: Record<Interval, string> = { '1m': '1m', '5m': '5m', '15m': '15m',
 const chartCandle = (c: Candle) => ({ ...c, time: c.time as UTCTimestamp });
 const volumeBar = (c: Candle) => ({ time: c.time as UTCTimestamp, value: c.volume, color: c.close >= c.open ? '#70daa052' : '#f17d8552' });
 export default function ChartPage({ assetId, onBack }: { assetId: string; onBack: () => void }) {
-  const asset = provider.getAsset(assetId), quote = useQuote(assetId), connection = useConnection();
+  const provider = providerFor(assetId);
+  const asset = provider.getAsset(assetId), quote = useQuote(assetId), connection = useConnection(assetId);
   const [interval, setIntervalValue] = useState<Interval>('15m');
   const [loading, setLoading] = useState(true), [error, setError] = useState(''), [retry, setRetry] = useState(0);
   const [hovered, setHovered] = useState<Candle | null>(null);
@@ -123,6 +124,6 @@ export default function ChartPage({ assetId, onBack }: { assetId: string; onBack
     {error && <div className="notice" role="alert">{error}<button className="text-button" onClick={() => setRetry(v => v + 1)}>Retry</button></div>}
     <div className="intervals" aria-label="Candle interval">{(Object.keys(INTERVALS) as Interval[]).map(value => <button key={value} className={interval === value ? 'active' : ''} aria-pressed={interval === value} onClick={() => setIntervalValue(value)}>{labels[value]}</button>)}</div>
     <div className="chart-notes"><span>Candle interval · UTC</span><span>Pinch to zoom</span></div>
-    <footer className="chart-footer">{provider.isDemo ? 'Simulated data' : 'Binance Spot data'} · Charts by <a href="https://www.tradingview.com/" target="_blank" rel="noreferrer">TradingView Lightweight Charts™</a></footer>
+    <footer className="chart-footer">{provider.isDemo ? 'Simulated data' : `${provider.name} Spot data`} · Charts by <a href="https://www.tradingview.com/" target="_blank" rel="noreferrer">TradingView Lightweight Charts™</a></footer>
   </section>;
 }

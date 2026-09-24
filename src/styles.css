@@ -15,3 +15,12 @@
 .backup-status{font-size:12px;color:var(--muted);margin-top:16px;line-height:1.5}.import-preview{margin-top:18px;padding:14px;background:#202a25;border:1px solid #34463a;border-radius:10px;font-size:12px;line-height:1.6}.import-preview h3{font-size:15px;margin-bottom:8px}.import-preview p{color:#b8c5bd}.import-preview ul{list-style:none;padding:0;margin:12px 0}.import-preview li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid #344039}.import-preview li>span:first-child{overflow-wrap:anywhere}.import-preview li>span:last-child{white-space:nowrap;color:var(--muted)}.import-preview small{font-size:9px;margin-left:7px;color:var(--green)}
 
 .tile-top{width:100%}.tile-top .pair{min-width:0;overflow:hidden;text-overflow:ellipsis}.tile-source-info{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:3px;flex-shrink:0}.tile-source{font-size:7px;line-height:8px;font-weight:400;letter-spacing:.3px;color:#8b979b}.tile-source-info .change-dots:empty{display:none}
+
+.quote-tile.stale,.quote-tile.stale .pair,.quote-tile.stale .pair>span,.quote-tile.stale .tile-price,.quote-tile.stale .tile-change,.quote-tile.stale .period-label,.quote-tile.stale .tile-source{color:#8b979b}
+
+.quote-tile.refreshing::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 25%,#c5d0d510 45%,#c5d0d521 50%,#c5d0d510 55%,transparent 75%);transform:translateX(-100%);animation:tile-refresh 1.8s ease-in-out infinite}
+@keyframes tile-refresh{to{transform:translateX(100%)}}
+@media(prefers-reduced-motion:reduce){.quote-tile.refreshing::after{animation:none;transform:none;opacity:.4}}
+.coin-avatar img{display:block;width:33px;height:33px;object-fit:contain}.asset-name{min-width:0}.asset-name small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.asset-exchange{font-size:8px;letter-spacing:.3px;color:#8b979b;flex-shrink:0}.exchange-filters{display:flex;gap:6px;margin:0 0 10px}.exchange-filters button{font-size:10px;padding:8px 10px;border:1px solid #35403e;border-radius:7px;color:#9aa7a1}.exchange-filters button[aria-pressed=true]{color:#e1e9e4;background:#303c36;border-color:#526559}.search-count{font-size:10px;color:var(--muted);padding-top:10px}.search-warning{font-size:12px;color:var(--muted);line-height:1.5}
+.asset-name strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile-content>.sparkline{width:75%;align-self:center}

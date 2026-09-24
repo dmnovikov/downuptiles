@@ -1,8 +1,9 @@
 # CryptoTiles
 
 A compact, mobile-first crypto watchlist. React + TypeScript + Vite, with an English UI.
-The default application now uses **real Binance Spot market data**, directly from the browser.
-No API keys, exchange account, backend or trading permissions are required.
+The application uses **real Binance Spot and MEXC Spot market data**.
+No API keys, exchange account or trading permissions are required. Binance connects directly;
+MEXC uses the included public-data proxy because its REST API does not allow browser CORS.
 
 ## Run
 
@@ -23,15 +24,16 @@ npm run build
 npm run preview
 ```
 
-The static production build is in `dist/`. Hash navigation supports static hosting.
-The app does not require a proxy or a private API credential.
+The production build is in `dist/`. Run `npm start` after building to serve it with the MEXC
+proxy (default port 5173; override with `PORT`). Development and preview include the same proxy.
+A static-only deployment must route `/api/mexc/*` to this server. No private credentials are used.
 
 ## Market data
 
-- Source: **Binance Spot**, USDT pairs only. Availability depends on region/network and exchange listings.
+- Sources: **Binance Spot and MEXC Spot**, USDT pairs only. Availability depends on region/network and exchange listings.
 - REST: `https://data-api.binance.vision/api/v3`.
 - WebSocket: `wss://data-stream.binance.vision/stream`.
-- Market discovery: cached `exchangeInfo`, active spot pairs only. Searches return up to 100 matches.
+- Market discovery: cached `exchangeInfo`, active spot pairs only. The picker shows 20 matches at a time, with exchange filters and Show 20 more.
 - Initial quotes: batched `ticker/24hr`, at most 20 symbols per request.
 - Sparklines: 15-minute candle closes for the last 24 hours, with the ticker's rolling 24h opening
   price at the start and current price at the end. The percent uses the same ticker baseline.
@@ -45,6 +47,21 @@ The app does not require a proxy or a private API credential.
   with chart polling every 15 seconds. Offline/background tabs pause subscriptions.
 - Unsupported pairs show an explicit message. **Real data is never replaced with mock prices.**
 
+### MEXC
+
+- Exchange IDs such as `mexc:MX` preserve the exact market through reload and layout export/import.
+- Quotes poll every 5 seconds, with at most four concurrent pair requests; sparklines cache for 60 seconds.
+- The candle chart polls every 15 seconds. Hourly and weekly intervals map to MEXC `60m` and `1W`.
+- Each exchange has its own connection, error state and local quote cache. A failing exchange does
+  not stop or gray out healthy quotes from the other exchange.
+- `/api/mexc/` proxies only GET requests to `exchangeInfo`, `ticker/24hr` and `klines` on the fixed
+  official host. Upstream requests time out after 10 seconds (client timeout: 12 seconds).
+- The proxy caches catalog responses for one hour, other successful responses for three seconds,
+  and coalesces simultaneous identical requests. It forwards rate-limit status and Retry-After.
+- Search failures are reported per exchange, with results from the available exchange retained.
+
+Reference: [MEXC Spot API](https://mexcdevelop.github.io/apidocs/spot_v3_en/).
+
 ### GRAM
 
 The user confirmed that GRAM means the native TON coin, formerly Toncoin, not a separate
@@ -52,7 +69,7 @@ TON-based token sharing the ticker. The existing `gram` asset ID explicitly maps
 `GRAMUSDT`, verified against the exchange announcement and `exchangeInfo`.
 Its display name is “Gram (formerly Toncoin)”; searching for Toncoin also finds GRAM.
 Legacy `ton` entries are not silently remapped: if TONUSDT is unavailable, the tile explains
-that Toncoin now trades as GRAM.
+that Toncoin now trades as GRAM in the error tooltip.
 
 Reference: [Binance Toncoin → Gram announcement](https://www.binance.com/en/square/post/340336090265410).
 
@@ -62,6 +79,12 @@ Official API references:
 [WebSocket streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md).
 
 ## UI and storage
+
+Last known quotes and sparklines are cached locally (up to 100 assets per provider).
+Reloading restores them in gray with `Stale data` until each asset receives a fresh quote.
+Failed first loads show `No data`. Cache writes are throttled to once per five seconds,
+with a final save when the page is hidden or left. Unavailable browser storage does not
+prevent live updates. Quote caches are separate from layout exports.
 
 - Two compact columns on phones; four on wide screens.
 - Initial Main tab: BTC, ETH, SOL, LTC, GRAM, TRX, BNB, XRP, in that order.
@@ -97,7 +120,7 @@ src/
   pages/            Lazy-loaded candlestick chart
   hooks/            Market subscriptions, workspace persistence, dialog history
   services/         MarketStore, stream/polling lifecycle, formatting
-  providers/        Binance provider, known asset metadata, mock provider
+  providers/        Binance/MEXC providers, registry, metadata and mock provider
   storage/          Workspace operations and saved-data validation
   types/            Market and workspace contracts
   App.tsx           Layout, navigation and gestures
@@ -111,7 +134,7 @@ quote through `useSyncExternalStore`; an update does not rerender the entire gri
 Array order determines tab/asset order, without duplicated `position` fields. Existing asset IDs
 are preserved. Additional Binance instruments use exchange-scoped IDs such as `binance:XYZ`.
 The provider validates those IDs against active exchange markets before requesting prices.
-One symbol can appear on multiple tabs, but cannot be added twice to the same tab.
+The same symbol from different exchanges can share a tab. The same exchange pair cannot be added twice.
 The last tab cannot be deleted; its asset list can be empty.
 
 `src/types/market.ts` defines the provider contract:
@@ -135,7 +158,7 @@ npm run test:live     # Real REST + WebSocket browser smoke test against port 51
 ```
 
 Playwright uses `/usr/bin/google-chrome`; override with `CHROME_PATH` if needed. Browser tests start
-or reuse their server. Live tests depend on network access and Binance availability. Screenshots and
+or reuse their server. Live tests depend on network access and both exchanges’ availability. Screenshots and
 failure traces go to `test-results/`.
 
 For a deliberate offline-development demo:
@@ -145,7 +168,7 @@ npm run dev -- --mode test --port 5174
 ```
 
 `.env.test` selects `VITE_MARKET_PROVIDER=mock`. The default development/production mode selects
-Binance. There is no automatic switch to demo data when Binance is unavailable.
+Binance and MEXC. There is no automatic switch to demo data when an exchange is unavailable.
 Mock prices and all chart intervals derive from one deterministic function of time.
 
 ## Remaining platform work
@@ -153,7 +176,7 @@ Mock prices and all chart intervals derive from one deterministic function of ti
 PWA/service worker, offline cold start, Capacitor, Android/iOS projects and app-store packaging are
 not implemented yet. The current milestone is the mobile web app. Physical Android/iPhone testing
 is still needed; Chromium touch emulation does not replace it. No accounts, orders, wallets,
-alerts, portfolio, cloud sync or backend are included.
+alerts, portfolio or cloud sync are included. The only server component is the public MEXC proxy.
 
 The conversation refinements supersede the original `task.md`: daily sparklines, signed movement
 dots, candlestick intervals, compact English UI, and now real market data.
@@ -162,3 +185,14 @@ dots, candlestick intervals, compact English UI, and now real market data.
 
 [TradingView Lightweight Charts™](https://www.tradingview.com/) is distributed under Apache-2.0.
 TradingView attribution is retained on the chart and in its footer.
+
+## Coin icons
+
+The picker loads local PNG icons lazily, including coins that are not in a watchlist.
+The base 483-icon [Cryptocurrency Icons](https://github.com/spothq/cryptocurrency-icons) set is CC0;
+its license is in `public/coins/LICENSE.md`. Coins without a matching icon retain a colored
+letter avatar. No external image requests or broken-image placeholders are required.
+
+Additional TON/GRAM, NEAR, SUI, APT, OP, ARB, SHIB and PEPE logos come from
+[Trust Wallet Assets](https://github.com/trustwallet/assets); its license is in
+`public/coins/TRUST-WALLET-LICENSE`. GRAM uses the TON logo for the confirmed native coin.

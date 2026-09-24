@@ -65,11 +65,17 @@ test('long press enters edit without opening chart; keyboard reorder persists', 
 test('offline keeps tiles and resumes; small and desktop viewports do not overflow', async ({ page, context }) => {
   await page.goto('/');
   await expect(page.getByTestId('tile-btc').locator('.tile-price')).not.toHaveText('—');
+  const lastPrice = await page.getByTestId('tile-btc').locator('.tile-price').textContent();
   await context.setOffline(true);
+  await expect(page.getByTestId('tile-btc')).toHaveClass(/stale/);
+  await expect(page.getByTestId('tile-btc').getByText('Stale data')).toBeVisible();
+  await expect(page.getByTestId('tile-btc').locator('.tile-price')).toHaveText(lastPrice!);
   await expect(page.getByText('Offline · Showing last known prices')).toBeVisible();
   await expect(page.locator('.quote-tile')).toHaveCount(8);
   await context.setOffline(false);
   await expect(page.getByText('Offline · Showing last known prices')).toBeHidden();
+  await expect(page.getByTestId('tile-btc')).not.toHaveClass(/stale/);
+  await expect(page.getByTestId('tile-btc').getByText('Stale data')).toBeHidden();
   for (const width of [320, 768, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -256,4 +262,47 @@ test('invalid import leaves the existing layout intact', async ({ page }) => {
   await expect(page.getByRole('alert')).toContainText('Your current layout has not changed.');
   await expect(page.getByRole('button', { name: 'Import and replace', exact: true })).toHaveCount(0);
   expect(await page.evaluate(() => localStorage.getItem('cryptotiles.workspace'))).toBe(before);
+});
+
+test('first load without connectivity shows gray No data tiles', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, 'onLine', { get: () => false, configurable: true }));
+  await page.goto('/');
+  const tile = page.getByTestId('tile-btc');
+  await expect(tile).toHaveClass(/stale/);
+  await expect(tile.getByText('No data', { exact: true })).toBeVisible();
+  await expect(tile.locator('.tile-price')).toHaveText('—');
+  await expect(tile.locator('.loading-line')).toHaveCount(0);
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'onLine', { get: () => true, configurable: true });
+    window.dispatchEvent(new Event('online'));
+  });
+  await expect(tile.locator('.tile-price')).not.toHaveText('—');
+  await expect(tile).not.toHaveClass(/stale/);
+  await expect(tile.getByText('No data', { exact: true })).toBeHidden();
+});
+
+test('reload restores cached prices and charts in gray until fresh data arrives', async ({ page }) => {
+  await page.goto('/');
+  const tile = page.getByTestId('tile-btc');
+  await expect(tile.locator('.tile-price')).not.toHaveText('—');
+  await expect(tile).not.toHaveClass(/stale/);
+  // Save the current snapshot as a mobile browser does when hiding the page.
+  await page.evaluate(() => window.dispatchEvent(new Event('pagehide')));
+  const cached = await page.evaluate(() => JSON.parse(localStorage.getItem('cryptotiles.quotes.v1.Demo')!).find((q: { assetId: string }) => q.assetId === 'btc'));
+  expect(cached.price).toBeGreaterThan(0);
+  await page.addInitScript(() => Object.defineProperty(navigator, 'onLine', { get: () => false, configurable: true }));
+  await page.reload();
+  await expect(tile).toHaveClass(/stale/);
+  await expect(tile.locator('.tile-price')).not.toHaveText('—');
+  await expect(tile.getByText('Stale data')).toBeVisible();
+  await expect(tile.locator('svg.sparkline')).toBeVisible();
+  await expect(tile.locator('.loading-line')).toHaveCount(0);
+  const color = await tile.locator('.tile-price').evaluate(el => getComputedStyle(el).color);
+  await expect(tile.locator('svg.sparkline')).toHaveCSS('color', color);
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'onLine', { get: () => true, configurable: true });
+    window.dispatchEvent(new Event('online'));
+  });
+  await expect(tile).not.toHaveClass(/stale/);
+  await expect(tile.getByText('Stale data')).toBeHidden();
 });
