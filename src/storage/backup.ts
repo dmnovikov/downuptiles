@@ -14,11 +14,11 @@ export function serializeBackup(workspace: Workspace, now = new Date()): string 
 }
 
 export function parseBackup(raw: string): Workspace {
-  if (new TextEncoder().encode(raw).length > MAX_BACKUP_BYTES) throw new Error('File is too large. Choose a CryptoTiles JSON backup under 256 KB.');
+  if (new TextEncoder().encode(raw).length > MAX_BACKUP_BYTES) throw new Error('File is too large. Choose a downuptiles JSON backup under 256 KB.');
   let data: unknown;
   try { data = JSON.parse(raw.replace(/^\uFEFF/, '')); }
-  catch { throw new Error('This file is not valid JSON. Choose a CryptoTiles layout backup.'); }
-  if (!data || typeof data !== 'object' || !('format' in data) || data.format !== FORMAT) throw new Error('This is not a CryptoTiles layout backup.');
+  catch { throw new Error('This file is not valid JSON. Choose a downuptiles layout backup.'); }
+  if (!data || typeof data !== 'object' || !('format' in data) || data.format !== FORMAT) throw new Error('This is not a downuptiles layout backup.');
   if (!('version' in data) || data.version !== 1) throw new Error('This backup version is not supported.');
   if (!('workspace' in data)) throw new Error('This backup does not contain a layout.');
   return parseWorkspace(JSON.stringify(data.workspace));
@@ -29,7 +29,7 @@ export function downloadBackup(workspace: Workspace): void {
   const url = URL.createObjectURL(new Blob([serializeBackup(workspace, now)], { type: 'application/json;charset=utf-8' }));
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `cryptotiles-layout-${now.toISOString().replace(/[:.]/g, '-')}.json`;
+  anchor.download = `downuptiles-layout-${now.toISOString().replace(/[:.]/g, '-')}.json`;
   document.body.appendChild(anchor);
   try { anchor.click(); }
   finally {

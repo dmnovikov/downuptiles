@@ -12,4 +12,4 @@ createServer((req, res) => mexcProxy(req, res, async () => {
     const content = await readFile(file);
     res.writeHead(200, { 'Content-Type': mime[extname(file)] || 'application/octet-stream' }); res.end(content);
   } catch { res.writeHead(404); res.end('Not found'); }
-})).listen(Number(process.env.PORT || 5173), '0.0.0.0', () => console.log('CryptoTiles server ready'));
+})).listen(Number(process.env.PORT || 5173), '0.0.0.0', () => console.log('downuptiles server ready'));

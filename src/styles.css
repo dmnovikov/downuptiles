@@ -24,3 +24,5 @@
 .coin-avatar img{display:block;width:33px;height:33px;object-fit:contain}.asset-name{min-width:0}.asset-name small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.asset-exchange{font-size:8px;letter-spacing:.3px;color:#8b979b;flex-shrink:0}.exchange-filters{display:flex;gap:6px;margin:0 0 10px}.exchange-filters button{font-size:10px;padding:8px 10px;border:1px solid #35403e;border-radius:7px;color:#9aa7a1}.exchange-filters button[aria-pressed=true]{color:#e1e9e4;background:#303c36;border-color:#526559}.search-count{font-size:10px;color:var(--muted);padding-top:10px}.search-warning{font-size:12px;color:var(--muted);line-height:1.5}
 .asset-name strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tile-content>.sparkline{width:75%;align-self:center}
+
+.brand-logo{display:block;flex-shrink:0;object-fit:contain;border-radius:7px}.brand{font-size:20px;letter-spacing:-.7px;gap:7px}

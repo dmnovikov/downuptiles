@@ -31,7 +31,7 @@ export function Settings({ workspace, onClose, onHelp, onReset, onImport }: Prop
     if (!file) return;
     setReading(true); setPending(null); setConfirming(false); setError(''); setMessage('');
     try {
-      if (file.size > MAX_BACKUP_BYTES) throw new Error('File is too large. Choose a CryptoTiles JSON backup under 256 KB.');
+      if (file.size > MAX_BACKUP_BYTES) throw new Error('File is too large. Choose a downuptiles JSON backup under 256 KB.');
       setPending(parseBackup(await file.text()));
     } catch (err) { setError(err instanceof Error ? err.message : 'Unable to read this file.'); }
     finally { setReading(false); }

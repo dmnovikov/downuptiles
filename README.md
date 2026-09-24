@@ -1,4 +1,6 @@
-# CryptoTiles
+# downuptiles
+
+<img src="public/logo.png" alt="downuptiles logo" width="96" />
 
 A compact, mobile-first crypto watchlist. React + TypeScript + Vite, with an English UI.
 The application uses **real Binance Spot and MEXC Spot market data**.
@@ -101,7 +103,7 @@ prevent live updates. Quote caches are separate from layout exports.
   keyboard users can focus the handle, press Space, move with arrows and press Space to drop.
 - Asset search adds immediately; **Done** closes the picker. Browser Back dismisses an open dialog first.
 - Settings include About, **Export layout**, **Import layout**, and **Reset to defaults**.
-- Export downloads a versioned `cryptotiles-layout-<timestamp>.json` file with tab IDs/names/order,
+- Export downloads a versioned `downuptiles-layout-<timestamp>.json` file with tab IDs/names/order,
   asset IDs/order and the active tab. It contains no quotes, account data or network credentials.
 - Import validates the file (maximum 256 KB), previews its tabs, and asks before replacing all lists.
   Invalid files, duplicate IDs/assets, unsupported versions and limits over 5 tabs/20 assets are rejected.
@@ -196,3 +198,6 @@ letter avatar. No external image requests or broken-image placeholders are requi
 Additional TON/GRAM, NEAR, SUI, APT, OP, ARB, SHIB and PEPE logos come from
 [Trust Wallet Assets](https://github.com/trustwallet/assets); its license is in
 `public/coins/TRUST-WALLET-LICENSE`. GRAM uses the TON logo for the confirmed native coin.
+
+The app was previously named CryptoTiles. Internal storage keys and the JSON backup format
+retain their original identifiers so existing layouts, cached quotes and exported files remain compatible.

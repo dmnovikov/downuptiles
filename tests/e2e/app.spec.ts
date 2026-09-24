@@ -207,7 +207,7 @@ test('asset picker has Done and browser Back dismisses dialogs without leaving t
   await expect(page.getByTestId('tile-doge')).toBeVisible();
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.getByRole('button', { name: /About/ }).click();
-  await expect(page.getByRole('dialog', { name: 'CryptoTiles' })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'downuptiles' })).toBeVisible();
   await page.goBack();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(page).toHaveURL(appUrl);
@@ -229,7 +229,7 @@ test('layout export and confirmed import preserve tabs, tiles and active selecti
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: /Export layout/ }).click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/^cryptotiles-layout-.*\.json$/);
+  expect(download.suggestedFilename()).toMatch(/^downuptiles-layout-.*\.json$/);
   const file = await download.path();
   expect(file).toBeTruthy();
   const { readFile } = await import('node:fs/promises');
