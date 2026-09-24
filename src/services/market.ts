@@ -8,6 +8,10 @@ export class MarketStore {
   private quotes = new Map<string, Quote>();
   private errors = new Map<string, string>();
   private listeners = new Map<string, Set<() => void>>();
+  private revision = 0;
+  private updateListeners = new Set<() => void>();
+  getRevision = () => this.revision;
+  subscribeUpdates = (callback: () => void) => { this.updateListeners.add(callback); return () => { this.updateListeners.delete(callback); }; };
   private statusListeners = new Set<() => void>();
   private status: ConnectionState = 'paused';
   private lastSaved = 0;
@@ -38,6 +42,7 @@ export class MarketStore {
       else { this.quotes.set(quote.assetId, quote); this.errors.delete(quote.assetId); this.cacheDirty = true; }
       this.listeners.get(quote.assetId)?.forEach(fn => fn());
     }
+    this.revision++; this.updateListeners.forEach(fn => fn());
     if (Date.now() - this.lastSaved >= 5000) this.saveCache();
   };
   connect(ids: string[], source: MarketDataProvider = primary) {

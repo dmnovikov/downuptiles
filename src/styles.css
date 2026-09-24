@@ -26,3 +26,5 @@
 .tile-content>.sparkline{width:75%;align-self:center}
 
 .brand-logo{display:block;flex-shrink:0;object-fit:contain;border-radius:7px}.brand{font-size:20px;letter-spacing:-.7px;gap:7px}
+
+.movers-header{display:flex;align-items:center;gap:9px;padding:14px 0;border-bottom:1px solid var(--border)}.movers-header .icon-button{margin-left:-8px}.movers-header h1{font-size:20px;font-weight:600}.movers-header p{font-size:10px;color:var(--muted);margin-top:4px}.movers-status{font-size:11px;line-height:1.5;color:var(--muted);padding:14px 0 4px}.movers-group{margin:17px 0 24px}.movers-group h2{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:550;margin-bottom:10px}.movers-empty{font-size:12px;color:var(--muted);padding:22px 12px;border:1px dashed var(--border);border-radius:8px}.movers-footnote{font-size:10px;line-height:1.6;color:var(--muted);padding-bottom:20px}

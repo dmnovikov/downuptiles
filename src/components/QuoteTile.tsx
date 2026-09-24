@@ -6,8 +6,8 @@ import { useConnection, useQuote, useQuoteError } from '../hooks/useMarket';
 import { providerFor } from '../services/market';
 import { direction, formatChange, formatPrice, changeDots } from '../services/format';
 import { Sparkline } from './Sparkline';
-interface Props { id: string; editing: boolean; onOpen: (id: string) => void; onEdit: () => void; onRemove: (id: string) => void; onMove: (id: string) => void }
-export const QuoteTile = memo(function QuoteTile({ id, editing, onOpen, onEdit, onRemove, onMove }: Props) {
+interface Props { id: string; editing: boolean; readOnly?: boolean; onOpen: (id: string) => void; onEdit: () => void; onRemove: (id: string) => void; onMove: (id: string) => void }
+export const QuoteTile = memo(function QuoteTile({ id, editing, readOnly = false, onOpen, onEdit, onRemove, onMove }: Props) {
   const provider = providerFor(id);
   const asset = provider.getAsset(id), quote = useQuote(id), error = useQuoteError(id);
   const connection = useConnection(id);
@@ -22,7 +22,7 @@ export const QuoteTile = memo(function QuoteTile({ id, editing, onOpen, onEdit, 
   return <article ref={setNodeRef} className={`quote-tile ${color} ${refreshing ? 'refreshing' : ''} ${editing ? 'editing' : ''} ${isDragging ? 'dragging' : ''}`} style={{ transform: CSS.Transform.toString(transform), transition }} data-testid={`tile-${id}`} aria-busy={refreshing}>
     <button className="tile-content" disabled={editing} aria-label={`Open chart for ${asset?.symbol ?? id}`} onContextMenu={event => event.preventDefault()}
       onPointerDown={event => {
-        if (editing || event.button !== 0) return;
+        if (readOnly || editing || event.button !== 0) return;
         cancel(); press.current = { x: event.clientX, y: event.clientY, fired: false, moved: false };
         press.current.timer = setTimeout(() => { if (press.current && !press.current.moved) { press.current.fired = true; onEdit(); } }, 500);
       }}

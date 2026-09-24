@@ -306,3 +306,52 @@ test('reload restores cached prices and charts in gray until fresh data arrives'
   await expect(tile).not.toHaveClass(/stale/);
   await expect(tile.getByText('Stale data')).toBeHidden();
 });
+
+test('Top movers includes all tabs, deduplicates, opens charts and returns to the selected tab', async ({ page, context }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('cryptotiles.workspace')) localStorage.setItem('cryptotiles.workspace', JSON.stringify({ version: 1, initialized: true, activeScreenId: 'second', screens: [
+      { id: 'main', name: 'Main', assets: ['btc', 'eth', 'sol'] },
+      { id: 'second', name: 'Other', assets: ['btc'] },
+    ] }));
+  });
+  await page.goto('/');
+  await expect(page.locator('.quote-tile')).toHaveCount(1);
+  await page.getByRole('link', { name: 'downuptiles · Top movers' }).click();
+  await expect(page).toHaveURL(/#\/movers$/);
+  await expect(page.getByRole('heading', { name: 'Top movers', exact: true })).toBeVisible();
+  await expect(page.getByText('3 of 3 pairs up to date')).toBeVisible();
+  await expect(page.locator('.movers-page .quote-tile')).toHaveCount(3);
+  await expect(page.getByTestId('tile-btc')).toHaveCount(1);
+  await expect(page.getByTestId('tile-eth')).toBeVisible();
+  const tile = page.getByTestId('tile-eth').locator('.tile-content');
+  await tile.dispatchEvent('pointerdown', { button: 0, clientX: 80, clientY: 280, pointerId: 1 });
+  await page.waitForTimeout(600);
+  await tile.dispatchEvent('pointerup', { button: 0 });
+  await expect(page.locator('.tile-actions')).toHaveCount(0);
+  await tile.click();
+  await expect(page.getByTestId('candle-chart')).toBeVisible();
+  await page.getByRole('button', { name: 'Back to Top movers' }).click();
+  await expect(page.getByRole('heading', { name: 'Top movers', exact: true })).toBeVisible();
+  await context.setOffline(true);
+  await expect(page.getByText('Offline · Rankings will resume when you reconnect.')).toBeVisible();
+  await expect(page.locator('.movers-page .quote-tile')).toHaveCount(0);
+  await context.setOffline(false);
+  await expect(page.locator('.movers-page .quote-tile')).toHaveCount(3);
+  await page.screenshot({ path: 'test-results/top-movers.png', fullPage: true });
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Top movers', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Back to watchlist' }).click();
+  await expect(page.getByRole('tab', { name: /Other/ })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('.quote-tile')).toHaveCount(1);
+  await page.getByRole('link', { name: 'downuptiles · Top movers' }).click();
+  await page.goBack();
+  await expect(page.getByRole('tab', { name: /Other/ })).toHaveAttribute('aria-selected', 'true');
+});
+
+test('Top movers direct link handles an empty workspace and returns safely', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('cryptotiles.workspace', JSON.stringify({ version: 1, initialized: true, activeScreenId: 'empty', screens: [{ id: 'empty', name: 'Empty', assets: [] }] })));
+  await page.goto('/#/movers');
+  await expect(page.getByText('Add pairs to your watchlists to see their top movers.')).toBeVisible();
+  await page.getByRole('button', { name: 'Back to watchlist' }).click();
+  await expect(page.getByRole('heading', { name: 'Your next watchlist' })).toBeVisible();
+});

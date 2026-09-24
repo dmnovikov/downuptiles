@@ -88,6 +88,11 @@ Failed first loads show `No data`. Cache writes are throttled to once per five s
 with a final save when the page is hidden or left. Unavailable browser storage does not
 prevent live updates. Quote caches are separate from layout exports.
 
+- Tap the logo for **Top movers**: up to five gainers and five losers across all tabs.
+  Repeated exchange pairs are deduplicated; the same symbol on different exchanges remains separate.
+  Only quotes from a healthy connection, without errors and no older than 60 seconds, qualify.
+  Displayed zero changes are excluded. Rankings update automatically; tap a tile for its chart.
+  Back returns through Top movers to the previously selected watchlist.
 - Two compact columns on phones; four on wide screens.
 - Initial Main tab: BTC, ETH, SOL, LTC, GRAM, TRX, BNB, XRP, in that order.
 - Price, daily sparkline and rolling 24h percentage. Green for gains, red for losses, yellow for

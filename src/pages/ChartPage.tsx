@@ -8,7 +8,7 @@ import { INTERVALS, type Candle, type Interval } from '../types/market';
 const labels: Record<Interval, string> = { '1m': '1m', '5m': '5m', '15m': '15m', '30m': '30m', '1h': '1h', '4h': '4h', '1d': '1d', '1w': '1w' };
 const chartCandle = (c: Candle) => ({ ...c, time: c.time as UTCTimestamp });
 const volumeBar = (c: Candle) => ({ time: c.time as UTCTimestamp, value: c.volume, color: c.close >= c.open ? '#70daa052' : '#f17d8552' });
-export default function ChartPage({ assetId, onBack }: { assetId: string; onBack: () => void }) {
+export default function ChartPage({ assetId, onBack, backLabel = 'Back to watchlist' }: { assetId: string; onBack: () => void; backLabel?: string }) {
   const provider = providerFor(assetId);
   const asset = provider.getAsset(assetId), quote = useQuote(assetId), connection = useConnection(assetId);
   const [interval, setIntervalValue] = useState<Interval>('15m');
@@ -114,7 +114,7 @@ export default function ChartPage({ assetId, onBack }: { assetId: string; onBack
   }, [loading, assetId, interval, connection]);
   const candle = hovered ?? latestCandle;
   return <section className="chart-page">
-    <header className="detail-header"><button className="icon-button" onClick={onBack} aria-label="Back to watchlist"><ArrowLeft size={22}/></button><div><h1>{asset?.symbol}<span className="muted"> / USDT</span></h1><span className="asset-subtitle">{asset?.name}</span></div><span className="demo-tag">{provider.isDemo ? 'DEMO' : provider.name.toUpperCase()}</span></header>
+    <header className="detail-header"><button className="icon-button" onClick={onBack} aria-label={backLabel}><ArrowLeft size={22}/></button><div><h1>{asset?.symbol}<span className="muted"> / USDT</span></h1><span className="asset-subtitle">{asset?.name}</span></div><span className="demo-tag">{provider.isDemo ? 'DEMO' : provider.name.toUpperCase()}</span></header>
     <div className="detail-price-row"><div className="detail-price">{quote ? formatPrice(quote.price) : '—'}<span>USDT</span></div><div className={`detail-change ${quote ? direction(quote.change24h) : ''}`}>{quote ? formatChange(quote.change24h) : '—'}<small>past 24 hours</small></div></div>
     <div className="daily-stats"><span>24h high <b>{quote ? formatPrice(quote.high24h) : '—'}</b></span><span>24h low <b>{quote ? formatPrice(quote.low24h) : '—'}</b></span></div>
     <div className="chart-toolbar"><span>Candlesticks</span><button className="text-button" onClick={() => { const count = candlesRef.current.length; chartRef.current?.timeScale().setVisibleLogicalRange({ from: Math.max(0, count - 65), to: count + 3 }); }}><Maximize2 size={13}/> Latest price</button></div>
