@@ -47,7 +47,7 @@ export function workspaceReducer(w: Workspace, action: WorkspaceAction): Workspa
       const screens = w.screens.filter(s => s.id !== action.id);
       return { ...w, screens, activeScreenId: w.activeScreenId === action.id ? screens[0].id : w.activeScreenId };
     }
-    case 'add': return updateScreen(action.screenId, s => s.assets.length >= MAX_ASSETS || s.assets.includes(action.assetId) ? s : { ...s, assets: [...s.assets, action.assetId] });
+    case 'add': if (w.screens.some(s => s.assets.includes(action.assetId))) return w; return updateScreen(action.screenId, s => s.assets.length >= MAX_ASSETS || s.assets.includes(action.assetId) ? s : { ...s, assets: [...s.assets, action.assetId] });
     case 'remove': return updateScreen(action.screenId, s => ({ ...s, assets: s.assets.filter(id => id !== action.assetId) }));
     case 'move': {
       const source = w.screens.find(s => s.id === action.from), target = w.screens.find(s => s.id === action.to);

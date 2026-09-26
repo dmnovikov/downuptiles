@@ -5,7 +5,7 @@
 @media(max-width:359px){.app-shell{padding-left:12px;padding-right:12px}.tile-content{padding:7px 9px;height:94px}.tile-price{font-size:15px}.pair{font-size:12px}.pair>span{font-size:8px}.change-dots{gap:2px}.change-dots i{width:4px;height:4px}.grid-caption{font-size:7px;letter-spacing:.2px}.screen-tools .icon-button{width:25px}.modal{padding-left:15px;padding-right:15px}.detail-price{font-size:25px}.detail-change{font-size:15px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
 
-.caption-pair{display:flex;align-items:center;gap:7px}.grid-caption .add-asset-button{width:28px;height:28px;flex-shrink:0;justify-content:center;padding:0;border-radius:6px;background:transparent;color:#a4aeae;border:1px solid var(--border)}.grid-caption .add-asset-button:hover:not(:disabled){background:#242c2d;color:#edf0ee}
+.caption-pair,.caption-status{display:flex;align-items:center;gap:7px}.grid-caption .add-asset-button{width:28px;height:28px;flex-shrink:0;justify-content:center;padding:0;border-radius:6px;background:transparent;color:#a4aeae;border:0}.grid-caption .add-asset-button:hover:not(:disabled){background:#242c2d;color:#d1d6d7}
 
 .settings-actions{display:grid;gap:4px}.settings-action{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:15px 0;border-bottom:1px solid var(--border);font-size:14px}.settings-action>svg{color:var(--muted);flex-shrink:0}.settings-action small{display:block;color:var(--muted);font-size:11px;margin-top:5px}.reset-warning{margin-top:10px;color:var(--red)}
 
@@ -35,3 +35,7 @@
 
 @media(max-width:420px){.app-header .brand{font-size:17px;gap:4px}.app-header .brand-logo{width:26px;height:26px}}
 @media(max-width:359px){.app-header .brand{font-size:14px}.app-header .brand-logo{width:22px;height:22px}.app-header .header-actions{gap:2px}}
+
+.grid-caption .edit-toggle{width:28px;height:28px;padding:0;justify-content:center;color:#a4aeae}.grid-caption .edit-toggle.active{color:var(--green)}
+
+.grid-caption.watchlist-caption{height:30px}.watchlist-caption .add-asset-button,.watchlist-caption .edit-toggle{width:26px;height:26px}

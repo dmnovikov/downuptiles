@@ -133,7 +133,7 @@ prevent live updates. Quote caches are separate from layout exports.
 - Tap a tile for candlesticks, volume, crosshair, pan and zoom. Intervals: 1m/5m/15m/30m/1h/4h/1d/1w.
   Chart timestamps use UTC. Older history loads when scrolling left, up to approximately 5000 candles.
 - The chart library is loaded only when opening the chart.
-- Up to 5 tabs with 20 assets each. The top `+` opens tab creation and management.
+- Up to 5 tabs with 20 assets each. The layers icon next to the tabs opens tab creation and management.
 - Swipe on tiles or empty space to switch tabs. Vertical scrolling stays available.
 - Hold a tile or tap the pencil to reorder, remove or move assets. Drag handles support touch/mouse;
   keyboard users can focus the handle, press Space, move with arrows and press Space to drop.
@@ -172,7 +172,7 @@ quote through `useSyncExternalStore`; an update does not rerender the entire gri
 Array order determines tab/asset order, without duplicated `position` fields. Existing asset IDs
 are preserved. Additional Binance instruments use exchange-scoped IDs such as `binance:XYZ`.
 The provider validates those IDs against active exchange markets before requesting prices.
-The same symbol from different exchanges can share a tab. The same exchange pair cannot be added twice.
+The same symbol from different exchanges can share a tab. The same exchange pair cannot be newly added across multiple tabs; pairs in other tabs are hidden in the picker. Existing saved/imported layouts are preserved.
 The last tab cannot be deleted; its asset list can be empty.
 
 `src/types/market.ts` defines the provider contract:
