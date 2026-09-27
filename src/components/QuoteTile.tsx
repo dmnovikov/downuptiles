@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef } from 'react';
-import { ArrowUpRight, GripVertical, Trash2 } from 'lucide-react';
+import { ArrowUpRight, GripVertical, Trash2, Trophy } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useConnection, useQuote, useQuoteError } from '../hooks/useMarket';
@@ -31,7 +31,7 @@ export const QuoteTile = memo(function QuoteTile({ id, editing, readOnly = false
       onPointerMove={event => { if (press.current && Math.hypot(event.clientX - press.current.x, event.clientY - press.current.y) > 9) { press.current.moved = true; cancel(); } }}
       onPointerUp={cancel} onPointerCancel={() => { cancel(); if (press.current) press.current.moved = true; }}
       onClick={() => { if (press.current?.fired || press.current?.moved) { press.current = null; return; } onOpen(id); }}>
-      <div className="tile-top"><span className="pair">{asset?.symbol ?? id}<span>/USDT</span></span><span className="tile-source-info"><span className="tile-source">{provider.isDemo ? 'DEMO' : provider.name.toUpperCase()}</span><span className="change-dots" aria-label={dots ? `${quote && quote.change24h < 0 ? 'Down more than' : 'Up more than'} ${dots === 3 ? 50 : dots === 2 ? 30 : 15} percent` : undefined}>{Array.from({ length: dots }, (_, i) => <i key={i}/>)}</span></span></div>
+      <div className="tile-top"><span className="pair">{asset?.symbol ?? id}<span>/USDT</span></span><span className="tile-source-info"><span className="tile-source">{provider.isDemo ? 'DEMO' : provider.name.toUpperCase()}</span><span className="change-dots" aria-label={dots ? `${quote && quote.change24h < 0 ? 'Down more than' : 'Up more than'} ${dots === 3 ? 50 : dots === 2 ? 30 : 15} percent` : undefined}>{dots > 0 && quote && quote.change24h > 0 ? Array.from({ length: dots }, (_, i) => <Trophy key={i} size={12} strokeWidth={2} className="growth-trophy" aria-hidden="true"/>) : Array.from({ length: dots }, (_, i) => <i key={i}/>)}</span></span></div>
       <div className="tile-price">{quote ? formatPrice(quote.price) : '—'}</div>
       {quote?.sparkline.length ? <Sparkline points={quote.sparkline}/> : unavailable ? <div className="tile-unavailable" title={error}>No data</div> : <div className="sparkline loading-line"/>}
       <div className="tile-bottom"><span className="tile-change">{quote ? formatChange(quote.change24h) : '—'}</span><span className="period-label">{stale ? 'Stale data' : '24h'}</span></div>

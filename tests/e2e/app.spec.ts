@@ -323,7 +323,7 @@ test('Top movers includes all tabs, deduplicates, opens charts and returns to th
   });
   await page.goto('/');
   await expect(page.locator('.quote-tile')).toHaveCount(1);
-  await page.getByRole('link', { name: 'downuptiles · Top movers' }).click();
+  await page.getByRole('button', { name: 'Tops', exact: true }).click();
   await expect(page).toHaveURL(/#\/movers$/);
   await expect(page.getByRole('heading', { name: 'Top movers', exact: true })).toBeVisible();
   await expect(page.getByText('3 of 3 pairs up to date')).toBeVisible();
@@ -350,7 +350,7 @@ test('Top movers includes all tabs, deduplicates, opens charts and returns to th
   await page.getByRole('button', { name: 'Back to watchlist' }).click();
   await expect(page.getByRole('tab', { name: /Other/ })).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('.quote-tile')).toHaveCount(1);
-  await page.getByRole('link', { name: 'downuptiles · Top movers' }).click();
+  await page.getByRole('button', { name: 'Tops', exact: true }).click();
   await page.goBack();
   await expect(page.getByRole('tab', { name: /Other/ })).toHaveAttribute('aria-selected', 'true');
 });
@@ -366,7 +366,7 @@ test('Top movers direct link handles an empty workspace and returns safely', asy
 test('Market movers switches sources, opens charts, preserves watchlists and handles offline data', async ({ page, context }) => {
   await page.goto('/');
   const before = await page.evaluate(() => localStorage.getItem('cryptotiles.workspace'));
-  await page.getByRole('link', { name: 'downuptiles · Top movers' }).click();
+  await page.getByRole('button', { name: 'Tops', exact: true }).click();
   await page.getByRole('tab', { name: 'Binance', exact: true }).click();
   await expect(page).toHaveURL(/#\/movers\/binance$/);
   await expect(page.getByRole('heading', { name: 'Top 10 Gainers' })).toBeVisible();
@@ -409,6 +409,8 @@ test('Crypto and Market switch preserves watchlists, labels world prices and sup
   await expect(page.getByRole('button', { name: 'Tops', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await page.reload();
   await expect(page.getByRole('button', { name: 'Tops', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('link', { name: 'downuptiles · Home' }).click();
+  await expect(page.getByRole('button', { name: 'Crypto', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: 'Market', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Market', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.world-tile')).toHaveCount(10);

@@ -39,3 +39,5 @@
 .grid-caption .edit-toggle{width:28px;height:28px;padding:0;justify-content:center;color:#a4aeae}.grid-caption .edit-toggle.active{color:var(--green)}
 
 .grid-caption.watchlist-caption{height:30px}.watchlist-caption .add-asset-button,.watchlist-caption .edit-toggle{width:26px;height:26px}
+
+.growth-trophy{color:var(--yellow);flex-shrink:0}.quote-tile.stale .growth-trophy{color:inherit}

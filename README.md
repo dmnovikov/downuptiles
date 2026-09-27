@@ -109,7 +109,7 @@ Failed first loads show `No data`. Cache writes are throttled to once per five s
 with a final save when the page is hidden or left. Unavailable browser storage does not
 prevent live updates. Quote caches are separate from layout exports.
 
-- Tap **Tops** (or the logo) for **Top movers**: up to five gainers and five losers across all tabs.
+- Tap **Tops** for **Top movers**: up to five gainers and five losers across all tabs.
   Repeated exchange pairs are deduplicated; the same symbol on different exchanges remains separate.
   Only quotes from a healthy connection, without errors and no older than 60 seconds, qualify.
   Displayed zero changes are excluded. Rankings update automatically; tap a tile for its chart.
@@ -124,12 +124,13 @@ prevent live updates. Quote caches are separate from layout exports.
 - Switching tabs stops the previous ranking's requests. Offline/failed refreshes retain the
   last ranking in gray with a warning. Market-tab selection survives chart navigation and reload.
   The MEXC proxy caches the bulk ticker response for 30 seconds across visitors.
+- The logo and app name return to Crypto, preserving the selected watchlist.
 - Two compact columns on phones; four on wide screens.
 - Initial Main tab: BTC, ETH, SOL, LTC, GRAM, TRX, BNB, XRP, in that order.
 - Price, daily sparkline and rolling 24h percentage. Green for gains, red for losses, yellow for
   changes rounding to zero. Values and colors use the same displayed percentage.
-- Movement dots: magnitude strictly greater than 15% / 30% / 50% gives one / two / three dots;
-  green for positive changes, red for negative changes.
+- Growth strictly greater than 15% / 30% / 50% shows one / two / three small yellow trophies.
+  Declines of the same magnitudes show one / two / three red dots; stale indicators turn gray.
 - Tap a tile for candlesticks, volume, crosshair, pan and zoom. Intervals: 1m/5m/15m/30m/1h/4h/1d/1w.
   Chart timestamps use UTC. Older history loads when scrolling left, up to approximately 5000 candles.
 - The chart library is loaded only when opening the chart.
