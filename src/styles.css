@@ -41,3 +41,4 @@
 .grid-caption.watchlist-caption{height:30px}.watchlist-caption .add-asset-button,.watchlist-caption .edit-toggle{width:26px;height:26px}
 
 .growth-trophy{color:var(--yellow);flex-shrink:0}.quote-tile.stale .growth-trophy{color:inherit}
+.startup-preference{cursor:pointer;justify-content:space-between}.startup-preference input{width:18px;height:18px;flex-shrink:0;accent-color:var(--green);cursor:pointer}

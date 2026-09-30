@@ -435,3 +435,29 @@ test('Crypto and Market switch preserves watchlists, labels world prices and sup
   await expect(page.getByRole('tabpanel')).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('cryptotiles.workspace'))).toBe(saved);
 });
+
+test('Tops startup preference persists and preserves explicit routes and Crypto navigation', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Crypto', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  const toggle = page.getByRole('switch', { name: /Open Tops on startup/ });
+  await expect(toggle).not.toBeChecked();
+  await toggle.check();
+  await page.getByRole('button', { name: 'Close', exact: true }).click();
+  await page.goto('/');
+  await expect(page).toHaveURL(/#\/movers$/);
+  await expect(page.getByRole('button', { name: 'Tops', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('link', { name: 'downuptiles · Home' }).click();
+  await expect(page.getByRole('button', { name: 'Crypto', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await page.goto('/#/movers/mexc');
+  await expect(page.getByRole('tab', { name: 'MEXC', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await page.goto('/#/asset/btc');
+  await expect(page.getByTestId('candle-chart')).toBeVisible();
+  await page.goto('/#/market');
+  await expect(page.getByRole('button', { name: 'Market', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(toggle).toBeChecked();
+  await toggle.uncheck();
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Crypto', exact: true })).toHaveAttribute('aria-pressed', 'true');
+});

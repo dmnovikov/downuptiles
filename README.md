@@ -139,6 +139,7 @@ prevent live updates. Quote caches are separate from layout exports.
 - Hold a tile or tap the pencil to reorder, remove or move assets. Drag handles support touch/mouse;
   keyboard users can focus the handle, press Space, move with arrows and press Space to drop.
 - Asset search adds immediately; **Done** closes the picker. Browser Back dismisses an open dialog first.
+- Settings offer **Open Tops on startup** (off by default): opening the base URL starts at Tops → My pairs. Explicit section/chart links take precedence; the logo still returns to Crypto. This browser preference is separate from layout backups.
 - Settings include About, **Export layout**, **Import layout**, and **Reset to defaults**.
 - Export downloads a versioned `downuptiles-layout-<timestamp>.json` file with tab IDs/names/order,
   asset IDs/order and the active tab. It contains no quotes, account data or network credentials.

@@ -3,6 +3,7 @@ import { CircleHelp, Download, RotateCcw, Upload } from 'lucide-react';
 import { Modal } from './Modal';
 import type { Workspace } from '../types/workspace';
 import { downloadBackup, MAX_BACKUP_BYTES, parseBackup } from '../storage/backup';
+import { readStartWithTops, saveStartWithTops } from '../storage/preferences';
 
 interface Props {
   workspace: Workspace;
@@ -18,6 +19,8 @@ export function Settings({ workspace, onClose, onHelp, onReset, onImport }: Prop
   const [reading, setReading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [startWithTops, setStartWithTops] = useState(readStartWithTops);
+  const [preferenceError, setPreferenceError] = useState('');
   const input = useRef<HTMLInputElement>(null);
 
   const exportLayout = () => {
@@ -39,12 +42,17 @@ export function Settings({ workspace, onClose, onHelp, onReset, onImport }: Prop
 
   return <Modal title="Settings" onClose={onClose}>
     <div className="settings-actions">
+      <label className="settings-action startup-preference"><span>Open Tops on startup<small>Start with My pairs instead of Crypto</small></span><input type="checkbox" role="switch" checked={startWithTops} onChange={event => {
+        try { saveStartWithTops(event.target.checked); setStartWithTops(event.target.checked); setPreferenceError(''); }
+        catch { setPreferenceError('Unable to save this setting in your browser.'); }
+      }}/></label>
       <button className="settings-action" onClick={onHelp}><CircleHelp size={19}/><span>About<small>Data, colors and controls</small></span></button>
       <button className="settings-action" onClick={exportLayout}><Download size={19}/><span>Export layout<small>Save your tabs and tile order to a JSON file</small></span></button>
       <button className="settings-action" disabled={reading} onClick={() => input.current?.click()}><Upload size={19}/><span>Import layout<small>Restore tabs and tile order from a backup</small></span></button>
       <input ref={input} type="file" accept=".json,application/json" aria-label="Layout backup file" hidden onChange={event => void readFile(event)}/>
       <button className="settings-action" disabled={reading} onClick={() => { setPending(null); setConfirming(true); setError(''); setMessage(''); }}><RotateCcw size={19}/><span>Reset to defaults<small>Restore the original watchlist</small></span></button>
     </div>
+    {preferenceError && <p className="notice" role="alert">{preferenceError}</p>}
     {reading && <p className="backup-status" role="status">Reading backup…</p>}
     {message && <p className="backup-status" role="status">{message}</p>}
     {error && <p className="notice" role="alert">{error} Your current layout has not changed.</p>}
