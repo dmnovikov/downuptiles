@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react';
-import { CircleHelp, Download, RotateCcw, Upload } from 'lucide-react';
+import { CircleHelp, Download, RotateCcw, Send, Upload } from 'lucide-react';
 import { Modal } from './Modal';
 import type { Workspace } from '../types/workspace';
 import { downloadBackup, MAX_BACKUP_BYTES, parseBackup } from '../storage/backup';
@@ -46,11 +46,12 @@ export function Settings({ workspace, onClose, onHelp, onReset, onImport }: Prop
         try { saveStartWithTops(event.target.checked); setStartWithTops(event.target.checked); setPreferenceError(''); }
         catch { setPreferenceError('Unable to save this setting in your browser.'); }
       }}/></label>
-      <button className="settings-action" onClick={onHelp}><CircleHelp size={19}/><span>About<small>Data, colors and controls</small></span></button>
       <button className="settings-action" onClick={exportLayout}><Download size={19}/><span>Export layout<small>Save your tabs and tile order to a JSON file</small></span></button>
       <button className="settings-action" disabled={reading} onClick={() => input.current?.click()}><Upload size={19}/><span>Import layout<small>Restore tabs and tile order from a backup</small></span></button>
       <input ref={input} type="file" accept=".json,application/json" aria-label="Layout backup file" hidden onChange={event => void readFile(event)}/>
       <button className="settings-action" disabled={reading} onClick={() => { setPending(null); setConfirming(true); setError(''); setMessage(''); }}><RotateCcw size={19}/><span>Reset to defaults<small>Restore the original watchlist</small></span></button>
+      <a className="settings-action settings-link" href="https://t.me/downuptiles" target="_blank" rel="noopener noreferrer"><Send size={19}/><span>Subscribe to our Telegram<small>@downuptiles</small></span></a>
+      <button className="settings-action" onClick={onHelp}><CircleHelp size={19}/><span>About<small>Version 0.3</small></span></button>
     </div>
     {preferenceError && <p className="notice" role="alert">{preferenceError}</p>}
     {reading && <p className="backup-status" role="status">Reading backup…</p>}

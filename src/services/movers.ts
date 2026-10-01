@@ -8,8 +8,8 @@ export function rankMovers(entries: MoverEntry[], now = Date.now() / 1000) {
     && Number.isFinite(entry.quote!.change24h) && now - entry.quote!.updatedAt <= 60 && entry.quote!.updatedAt <= now + 5);
   const tie = (a: MoverEntry, b: MoverEntry) => a.id.localeCompare(b.id);
   return {
-    gainers: fresh.filter(e => direction(e.quote.change24h) === 'up').sort((a, b) => b.quote.change24h - a.quote.change24h || tie(a, b)).slice(0, 5),
-    losers: fresh.filter(e => direction(e.quote.change24h) === 'down').sort((a, b) => a.quote.change24h - b.quote.change24h || tie(a, b)).slice(0, 5),
+    gainers: fresh.filter(e => direction(e.quote.change24h) === 'up').sort((a, b) => b.quote.change24h - a.quote.change24h || tie(a, b)).slice(0, 6),
+    losers: fresh.filter(e => direction(e.quote.change24h) === 'down').sort((a, b) => a.quote.change24h - b.quote.change24h || tie(a, b)).slice(0, 6),
     freshCount: fresh.length, total: unique.length,
   };
 }

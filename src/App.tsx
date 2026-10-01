@@ -73,6 +73,7 @@ export default function App() {
         <div className="watchlist-footer"><span>{String(index + 1).padStart(2, '0')} / {String(workspace.screens.length).padStart(2, '0')}</span><div className="page-dots">{workspace.screens.map(s => <button key={s.id} className={s.id === screen.id ? 'active' : ''} aria-label={`Switch to tab ${s.name}`} onClick={() => dispatch({ type: 'activate', id: s.id })}/>)}</div><span>{editing ? 'EDITING' : 'SAVED ON DEVICE'}</span></div>
         </div>
       </main>}
+      <footer className="site-disclaimer"><p>For information only. Not financial advice. Data may be delayed or inaccurate. To the extent permitted by law, the author accepts no liability for losses arising from its use.</p></footer>
     </>}
     {modal === 'search' && <SearchAssets selected={screen.assets} excluded={workspace.screens.filter(s => s.id !== screen.id).flatMap(s => s.assets)} screenName={screen.name} onClose={() => setModal(null)} onAdd={id => { dispatch({ type: 'add', screenId: screen.id, assetId: id }); setToast(`${provider.getAsset(id)?.symbol} added`); }}/>}
     {modal === 'screens' && <ScreenManager workspace={workspace} dispatch={dispatch} onClose={() => setModal(null)}/>}

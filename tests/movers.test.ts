@@ -4,10 +4,10 @@ const now = 1700000000;
 function entry(id: string, change24h: number, extra: Partial<MoverEntry> = {}): MoverEntry {
   return { id, status: 'live', quote: { assetId: id, change24h, price: 10, updatedAt: now, high24h: 12, low24h: 9, sparkline: [{ time: now, value: 10 }] }, ...extra };
 }
-it('ranks at most five positive and negative pairs from strongest moves, with deterministic ties', () => {
+it('ranks at most six positive and negative pairs from strongest moves, with deterministic ties', () => {
   const result = rankMovers([...Array.from({ length: 8 }, (_, i) => entry(`up${i}`, i + 1)), ...Array.from({ length: 8 }, (_, i) => entry(`down${i}`, -i - 1)), entry('flat', .001)], now);
-  expect(result.gainers.map(e => e.id)).toEqual(['up7', 'up6', 'up5', 'up4', 'up3']);
-  expect(result.losers.map(e => e.id)).toEqual(['down7', 'down6', 'down5', 'down4', 'down3']);
+  expect(result.gainers.map(e => e.id)).toEqual(['up7', 'up6', 'up5', 'up4', 'up3', 'up2']);
+  expect(result.losers.map(e => e.id)).toEqual(['down7', 'down6', 'down5', 'down4', 'down3', 'down2']);
   expect(rankMovers([entry('b', 2), entry('a', 2)], now).gainers.map(e => e.id)).toEqual(['a', 'b']);
 });
 it('deduplicates exchange pairs but keeps the same symbol from different exchanges', () => {

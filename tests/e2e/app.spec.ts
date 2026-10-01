@@ -387,7 +387,7 @@ test('Market movers switches sources, opens charts, preserves watchlists and han
   await page.reload();
   await expect(page.getByRole('tab', { name: 'MEXC', exact: true })).toHaveAttribute('aria-selected', 'true');
   await page.getByRole('tab', { name: 'My pairs', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Top 5 Gainers' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Top 6 Gainers' })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('cryptotiles.workspace'))).toBe(before);
 });
 
