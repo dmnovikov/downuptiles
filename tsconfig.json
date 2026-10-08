@@ -23,6 +23,7 @@
     "src",
     "tests",
     "vite.config.ts",
+    "capacitor.config.ts",
     "playwright.config.ts",
     "playwright.live.config.ts"
   ]

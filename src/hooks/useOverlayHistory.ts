@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-type ModalName = 'search' | 'screens' | 'help' | 'settings';
+type ModalName = 'search' | 'screens' | 'help' | 'settings' | 'disclaimer';
 interface Overlay { modal: ModalName | null; moving: string | null }
 const empty: Overlay = { modal: null, moving: null };
 const historyKey = 'cryptoTilesOverlay';
 function readOverlay(): Overlay {
   const saved = history.state?.[historyKey];
   if (!saved || typeof saved !== 'object') return empty;
-  if (['search', 'screens', 'help', 'settings'].includes(saved.modal)) return { modal: saved.modal, moving: null };
+  if (['search', 'screens', 'help', 'settings', 'disclaimer'].includes(saved.modal)) return { modal: saved.modal, moving: null };
   if (typeof saved.moving === 'string' && saved.moving) return { modal: null, moving: saved.moving };
   return empty;
 }

@@ -1,5 +1,6 @@
 import type { Workspace } from '../types/workspace';
 import { parseWorkspace } from './workspace';
+import { Capacitor } from '@capacitor/core';
 
 export const MAX_BACKUP_BYTES = 256 * 1024;
 const FORMAT = 'cryptotiles-layout';
@@ -24,12 +25,21 @@ export function parseBackup(raw: string): Workspace {
   return parseWorkspace(JSON.stringify(data.workspace));
 }
 
-export function downloadBackup(workspace: Workspace): void {
+export async function downloadBackup(workspace: Workspace): Promise<void> {
   const now = new Date();
+  const filename = `downuptiles-layout-${now.toISOString().replace(/[:.]/g, '-')}.json`;
+  if (Capacitor.isNativePlatform()) {
+    const [{ Filesystem, Directory, Encoding }, { Share }] = await Promise.all([
+      import('@capacitor/filesystem'), import('@capacitor/share'),
+    ]);
+    const file = await Filesystem.writeFile({ path: filename, data: serializeBackup(workspace, now), directory: Directory.Cache, encoding: Encoding.UTF8 });
+    await Share.share({ title: 'downuptiles layout', files: [file.uri], dialogTitle: 'Save or share your layout' });
+    return;
+  }
   const url = URL.createObjectURL(new Blob([serializeBackup(workspace, now)], { type: 'application/json;charset=utf-8' }));
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `downuptiles-layout-${now.toISOString().replace(/[:.]/g, '-')}.json`;
+  anchor.download = filename;
   document.body.appendChild(anchor);
   try { anchor.click(); }
   finally {

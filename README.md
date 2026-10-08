@@ -239,3 +239,9 @@ Additional TON/GRAM, NEAR, SUI, APT, OP, ARB, SHIB and PEPE logos come from
 
 The app was previously named CryptoTiles. Internal storage keys and the JSON backup format
 retain their original identifiers so existing layouts, cached quotes and exported files remain compatible.
+
+## Android
+
+A bundled Android app is available for local testing. Run `npm run android:apk`
+with JDK 21 and Android SDK 36 installed. See [ANDROID.md](ANDROID.md) for setup,
+APK installation, native behavior and release limitations.

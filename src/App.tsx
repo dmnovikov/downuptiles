@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { Check, ChevronRight, Settings as SettingsIcon, Layers, Pencil, Plus, WifiOff } from 'lucide-react';
+import { Check, ChevronRight, Download, Settings as SettingsIcon, Layers, Pencil, Plus, WifiOff } from 'lucide-react';
 import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { WorldMarket } from './pages/WorldMarket';
@@ -12,6 +12,7 @@ import { ScreenManager } from './components/ScreenManager';
 import { Settings } from './components/Settings';
 import { useWorkspace } from './hooks/useWorkspace';
 import { useOverlayHistory } from './hooks/useOverlayHistory';
+import { useAndroidBack } from './hooks/useAndroidBack';
 import { useConnection, useMarket } from './hooks/useMarket';
 import { provider } from './services/market';
 import { trackPageView } from './services/analytics';
@@ -24,6 +25,8 @@ export default function App() {
   const { workspace, dispatch, storageError } = useWorkspace();
   const screen = workspace.screens.find(s => s.id === workspace.activeScreenId)!;
   const [assetId, setAssetId] = useState<string | null>(routeAsset), [editing, setEditing] = useState(false);
+  const finishEditing = useCallback(() => setEditing(false), []);
+  useAndroidBack(editing, finishEditing);
   const [movers, setMovers] = useState(() => location.hash.startsWith('#/movers'));
   const [moversTab, setMoversTab] = useState<MoversTab>(routeMoversTab);
   const [world, setWorld] = useState(worldRoute);
@@ -52,6 +55,7 @@ export default function App() {
   const swipe = useRef<{ x: number; y: number } | null>(null);
   const index = workspace.screens.indexOf(screen);
   return <div className="app-shell">
+    {import.meta.env.DEV && <div className="local-download"><a href="/artifacts/downuptiles-0.3-debug.apk" download="downuptiles-0.3-debug.apk"><Download size={15}/>Download APK</a></div>}
     {storageError && <div className="notice" role="alert">{storageError}</div>}
     {!world.active && (connection === 'offline' || connection === 'error') && <div className="connection-banner" role="status"><WifiOff size={14}/>{connection === 'offline' ? 'Offline · Showing last known prices' : 'Prices may be outdated · Reconnecting'}</div>}
     {world.id ? <Suspense fallback={<div className="page-loading">Loading chart…</div>}><WorldDetail key={world.id} id={world.id} onBack={backWorld}/></Suspense> : assetId ? connection === 'offline' && !chartLoaded ? <div className="empty-state"><WifiOff size={30}/><h2>Chart not downloaded yet</h2><p>It will load when you are back online.<br/>Your watchlists are still available.</p><button className="primary-button" onClick={back}>Back to watchlist</button></div> : <Suspense fallback={<div className="page-loading">Loading chart…</div>}><ChartPage assetId={assetId} onBack={back} backLabel={history.state?.chartFrom === 'movers' ? 'Back to Top movers' : 'Back to watchlist'}/></Suspense> : <>
@@ -73,11 +77,11 @@ export default function App() {
         <div className="watchlist-footer"><span>{String(index + 1).padStart(2, '0')} / {String(workspace.screens.length).padStart(2, '0')}</span><div className="page-dots">{workspace.screens.map(s => <button key={s.id} className={s.id === screen.id ? 'active' : ''} aria-label={`Switch to tab ${s.name}`} onClick={() => dispatch({ type: 'activate', id: s.id })}/>)}</div><span>{editing ? 'EDITING' : 'SAVED ON DEVICE'}</span></div>
         </div>
       </main>}
-      <footer className="site-disclaimer"><p>For information only. Not financial advice. Data may be delayed or inaccurate. To the extent permitted by law, the author accepts no liability for losses arising from its use.</p></footer>
     </>}
     {modal === 'search' && <SearchAssets selected={screen.assets} excluded={workspace.screens.filter(s => s.id !== screen.id).flatMap(s => s.assets)} screenName={screen.name} onClose={() => setModal(null)} onAdd={id => { dispatch({ type: 'add', screenId: screen.id, assetId: id }); setToast(`${provider.getAsset(id)?.symbol} added`); }}/>}
     {modal === 'screens' && <ScreenManager workspace={workspace} dispatch={dispatch} onClose={() => setModal(null)}/>}
-    {modal === 'settings' && <Settings workspace={workspace} onImport={next => { dispatch({ type: 'import', workspace: next }); setEditing(false); setModal(null); setToast('Layout imported'); }} onClose={() => setModal(null)} onHelp={() => setModal('help')} onReset={() => { dispatch({ type: 'reset' }); setEditing(false); setModal(null); setToast('Default Main tab restored'); }}/>}
+    {modal === 'settings' && <Settings workspace={workspace} onImport={next => { dispatch({ type: 'import', workspace: next }); setEditing(false); setModal(null); setToast('Layout imported'); }} onClose={() => setModal(null)} onHelp={() => setModal('help')} onDisclaimer={() => setModal('disclaimer')} onReset={() => { dispatch({ type: 'reset' }); setEditing(false); setModal(null); setToast('Default Main tab restored'); }}/>}
+    {modal === 'disclaimer' && <Modal title="Disclaimer" onClose={() => setModal(null)}><p className="help-copy">For information only. Not financial advice. Data may be delayed or inaccurate. To the extent permitted by law, the author accepts no liability for losses arising from its use.</p></Modal>}
     {modal === 'help' && <Modal title="downuptiles" onClose={() => setModal(null)}><p className="help-intro">The market at a glance.</p><p className="help-copy">{provider.isDemo ? 'These are simulated quotes, not live market prices. They update every 2 seconds.' : 'Prices, 24-hour changes and candles come from Binance Spot and MEXC Spot. The exchange is shown on each tile. Availability depends on your region and network. Prices are never replaced with simulated data.'}</p><div className="help-section"><h3>Each tile shows the last 24 hours</h3><p>The line uses 15-minute samples. Line and percentage colors: <span className="up">up</span>, <span className="down">down</span>, <span className="flat">unchanged</span>.</p><p>Yellow trophies: 1 for &gt;15%, 2 for &gt;30%, 3 for &gt;50% growth.</p><p><span className="down">●</span> &lt;−15% &nbsp; <span className="down">●●</span> &lt;−30% &nbsp; <span className="down">●●●</span> &lt;−50%</p></div><div className="help-section"><h3>Make it yours</h3><p>Press and hold a tile to reorder, remove or move it. Swipe or tap a tab to switch lists.</p><p>Your lists are saved in this browser. Create up to 5 tabs with 20 assets each.</p></div><div className="help-section"><h3>Market · For reference</h3><p>The Market section provides a quick overview for comparing crypto with global markets. Quotes may be delayed or updated at different times, so prices and charts may not reflect the same moment.</p></div><div className="help-section"><h3>Missing a pair?</h3><p>If you cannot find a pair on Binance or MEXC, let us know which pairs you would like to see.</p><p><a href="https://github.com/dmnovikov/downuptiles/issues/new" target="_blank" rel="noreferrer">Request a pair on GitHub</a></p></div><div className="help-section"><h3>Credits</h3><p>Created by Dmitrij Novikov.<br/>Built with AI assistance.</p><p><a href="https://github.com/dmnovikov/downuptiles" target="_blank" rel="noreferrer">GitHub · downuptiles</a></p></div></Modal>}
     {moving && <Modal title={`Move ${provider.getAsset(moving)?.symbol ?? moving}`} onClose={() => setMoving(null)}><p className="muted modal-description">Choose a destination tab</p><div className="move-list">{workspace.screens.filter(s => s.id !== screen.id).map(s => {
       const reason = s.assets.includes(moving) ? 'Already added' : s.assets.length >= 20 ? 'Tab is full' : `${s.assets.length} / 20 assets`;

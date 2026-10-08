@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/api';
 import { parseMarketTickers } from './market-tickers';
 import type { Asset, Candle, HistoryRequest, MarketDataProvider, Quote, QuoteResult } from '../types/market';
 import { KNOWN_ASSETS } from './assets';
@@ -11,7 +12,7 @@ export class MexcMarketDataProvider implements MarketDataProvider {
   private catalogTime = 0;
   private cooldownUntil = 0;
   private history = new Map<string, { time: number; candles: Candle[] }>();
-  constructor(private fetcher: typeof fetch = (...args) => fetch(...args)) {}
+  constructor(private fetcher: (url: string, init?: RequestInit) => Promise<Response> = apiFetch) {}
   getAsset(id: string): Asset | undefined {
     if (!/^mexc:[A-Z0-9]{1,30}$/.test(id)) return undefined;
     const symbol = id.slice(5), known = KNOWN_ASSETS.find(a => a.symbol === symbol);

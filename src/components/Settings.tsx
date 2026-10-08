@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react';
-import { CircleHelp, Download, RotateCcw, Send, Upload } from 'lucide-react';
+import { CircleHelp, Download, FileText, RotateCcw, Send, Upload } from 'lucide-react';
 import { Modal } from './Modal';
 import type { Workspace } from '../types/workspace';
 import { downloadBackup, MAX_BACKUP_BYTES, parseBackup } from '../storage/backup';
@@ -9,11 +9,12 @@ interface Props {
   workspace: Workspace;
   onClose: () => void;
   onHelp: () => void;
+  onDisclaimer: () => void;
   onReset: () => void;
   onImport: (workspace: Workspace) => void;
 }
 
-export function Settings({ workspace, onClose, onHelp, onReset, onImport }: Props) {
+export function Settings({ workspace, onClose, onHelp, onDisclaimer, onReset, onImport }: Props) {
   const [confirming, setConfirming] = useState(false);
   const [pending, setPending] = useState<Workspace | null>(null);
   const [reading, setReading] = useState(false);
@@ -23,9 +24,9 @@ export function Settings({ workspace, onClose, onHelp, onReset, onImport }: Prop
   const [preferenceError, setPreferenceError] = useState('');
   const input = useRef<HTMLInputElement>(null);
 
-  const exportLayout = () => {
+  const exportLayout = async () => {
     setError(''); setMessage('');
-    try { downloadBackup(workspace); setMessage('Your layout backup is ready to save.'); }
+    try { await downloadBackup(workspace); setMessage('Your layout backup is ready to save.'); }
     catch { setError('Unable to export your layout. Please try again.'); }
   };
   const readFile = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +52,7 @@ export function Settings({ workspace, onClose, onHelp, onReset, onImport }: Prop
       <input ref={input} type="file" accept=".json,application/json" aria-label="Layout backup file" hidden onChange={event => void readFile(event)}/>
       <button className="settings-action" disabled={reading} onClick={() => { setPending(null); setConfirming(true); setError(''); setMessage(''); }}><RotateCcw size={19}/><span>Reset to defaults<small>Restore the original watchlist</small></span></button>
       <a className="settings-action settings-link" href="https://t.me/downuptiles" target="_blank" rel="noopener noreferrer"><Send size={19}/><span>Subscribe to our Telegram<small>@downuptiles</small></span></a>
+      <button className="settings-action" onClick={onDisclaimer}><FileText size={19}/><span>Disclaimer</span></button>
       <button className="settings-action" onClick={onHelp}><CircleHelp size={19}/><span>About<small>Version 0.3</small></span></button>
     </div>
     {preferenceError && <p className="notice" role="alert">{preferenceError}</p>}

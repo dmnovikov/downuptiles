@@ -8,3 +8,6 @@ tmp/
 .env.*
 !.env.test
 test-results-live/
+artifacts/
+*.keystore
+*.jks

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">downuptiles</string>
+    <string name="title_activity_main">downuptiles</string>
+    <string name="package_name">com.downuptiles.app</string>
+    <string name="custom_url_scheme">com.downuptiles.app</string>
+</resources>

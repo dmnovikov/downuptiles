@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/api';
 import { useEffect, useState } from 'react';
 import { WORLD_ASSETS, type WorldQuote } from '../types/world';
 interface Entry { quote?: WorldQuote; error?: string; refreshing: boolean }
@@ -37,7 +38,7 @@ export function useWorldQuotes(ids: string[], interval = '15m') {
         const timeout = setTimeout(() => request.abort(), 30000), request = new AbortController();
         const abort = () => request.abort(); signal.addEventListener('abort', abort, { once: true });
         try {
-          const response = await fetch(`/api/world/quote?id=${encodeURIComponent(id)}&interval=${encodeURIComponent(interval)}`, { signal: request.signal });
+          const response = await apiFetch(`/api/world/quote?id=${encodeURIComponent(id)}&interval=${encodeURIComponent(interval)}`, { signal: request.signal });
           const data = await response.json();
           if (!response.ok) throw new Error(data.error || 'Source unavailable');
           if (!valid(data) || data.id !== id) throw new Error('Invalid market quote');
